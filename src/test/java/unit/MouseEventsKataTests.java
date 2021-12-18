@@ -12,11 +12,13 @@ public class MouseEventsKataTests {
     class SpyEventListener implements MouseEventListener {
         public MouseEventType receivedEventType;
         public boolean wasEventTriggered;
+        public int eventCount;
 
         @Override
         public void handleMouseEvent(MouseEventType eventType) {
             this.receivedEventType = eventType;
             wasEventTriggered = true;
+            eventCount++;
         }
     }
 
@@ -53,5 +55,19 @@ public class MouseEventsKataTests {
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
         assertThat(listener.wasEventTriggered).isFalse();
+    }
+
+    @Test
+    public void button_can_only_be_released_once(){
+        var mouse = new Mouse();
+        var listener = new SpyEventListener();
+        mouse.subscribe(listener);
+
+        mouse.pressLeftButton(System.currentTimeMillis());
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+
+        assertThat(listener.eventCount).isEqualTo(1);
     }
 }

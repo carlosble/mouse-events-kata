@@ -96,12 +96,13 @@ public class MouseEventsKataTests {
         var listener = new SpyEventListener();
         mouse.subscribe(listener);
 
-        mouse.pressLeftButton(System.currentTimeMillis());
-        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
-        mouse.pressLeftButton(System.currentTimeMillis());
-        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
-        mouse.pressLeftButton(System.currentTimeMillis());
-        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+        long firstTime = System.currentTimeMillis();
+        mouse.pressLeftButton(firstTime);
+        mouse.releaseLeftButton(firstTime + 10);
+        mouse.pressLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick - 50);
+        mouse.releaseLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick - 5);
+        mouse.pressLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick + 10);
+        mouse.releaseLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick + 20);
 
         Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.TripleClick);

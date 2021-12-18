@@ -35,7 +35,7 @@ public class MouseEventsKataTests {
     //       no move
 
     @Test
-    public void single_click_means_pressing_and_releasing_mouse_button(){
+    public void single_click_means_pressing_and_releasing_mouse_button() throws InterruptedException {
         var mouse = new Mouse();
         var listener = new SpyEventListener();
         mouse.subscribe(listener);
@@ -43,22 +43,24 @@ public class MouseEventsKataTests {
         mouse.pressLeftButton(System.currentTimeMillis());
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
+        Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.SingleClick);
     }
 
     @Test
-    public void single_click_does_not_happen_if_button_is_never_pressed(){
+    public void single_click_does_not_happen_if_button_is_never_pressed() throws InterruptedException {
         var mouse = new Mouse();
         var listener = new SpyEventListener();
         mouse.subscribe(listener);
 
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
+        Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
         assertThat(listener.wasEventTriggered).isFalse();
     }
 
     @Test
-    public void button_can_only_be_released_once(){
+    public void button_can_only_be_released_once() throws InterruptedException {
         var mouse = new Mouse();
         var listener = new SpyEventListener();
         mouse.subscribe(listener);
@@ -68,6 +70,23 @@ public class MouseEventsKataTests {
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
+        Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
+        assertThat(listener.eventCount).isEqualTo(1);
+    }
+
+    @Test
+    public void double_click_happens_when_single_click_is_repetead_quickly() throws InterruptedException {
+        var mouse = new Mouse();
+        var listener = new SpyEventListener();
+        mouse.subscribe(listener);
+
+        mouse.pressLeftButton(System.currentTimeMillis());
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+        mouse.pressLeftButton(System.currentTimeMillis());
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+
+        Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
+        assertThat(listener.receivedEventType).isEqualTo(MouseEventType.DoubleClick);
         assertThat(listener.eventCount).isEqualTo(1);
     }
 }

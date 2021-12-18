@@ -1,13 +1,20 @@
 package mouse;
 
+import jdk.jfr.EventType;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class Mouse {
     private List<MouseEventListener> listeners = new ArrayList<>();
-    private final long timeWindowInMillisecondsForDoubleClick = 500;
+    public static final long timeWindowInMillisecondsForDoubleClick = 500;
     private long lastTimePressed;
     private boolean buttonIsPressed;
+    private boolean isWaitingToTriggerSingleClick;
+    private boolean isWaitingToTriggerDoubleClick;
+    private static MouseEventType eventToTrigger;
 
     public void pressLeftButton(long currentTimeInMilliseconds) {
         lastTimePressed = currentTimeInMilliseconds;
@@ -17,7 +24,30 @@ public class Mouse {
     public void releaseLeftButton(long currentTimeInMilliseconds) {
         if (lastTimePressed > 0 && buttonIsPressed) {
             buttonIsPressed = false;
-            notifySubscribers(MouseEventType.SingleClick);
+            if (!isWaitingToTriggerSingleClick) {
+                isWaitingToTriggerSingleClick = true;
+                eventToTrigger = MouseEventType.SingleClick;
+            }
+            else {
+                isWaitingToTriggerDoubleClick = true;
+                eventToTrigger = MouseEventType.DoubleClick;
+            }
+            CompletableFuture.delayedExecutor(
+                    timeWindowInMillisecondsForDoubleClick,
+                    TimeUnit.MILLISECONDS).execute(
+                            () -> {
+                                var shouldNotify = isWaitingToTriggerSingleClick ||
+                                        isWaitingToTriggerDoubleClick;
+                                if (isWaitingToTriggerSingleClick) {
+                                    isWaitingToTriggerSingleClick = false;
+                                }
+                                if (isWaitingToTriggerDoubleClick) {
+                                    isWaitingToTriggerDoubleClick = false;
+                                }
+                                if (shouldNotify){
+                                    notifySubscribers(eventToTrigger);
+                                }
+                            });
         }
     }
 

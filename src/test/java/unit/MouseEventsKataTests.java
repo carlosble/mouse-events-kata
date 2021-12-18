@@ -19,7 +19,7 @@ public class MouseEventsKataTests {
             wasEventTriggered = true;
         }
     }
-    
+
     // TODO:
     //  single click
     //     no click, several clicks after a long time, multiples clicks without release?
@@ -42,5 +42,16 @@ public class MouseEventsKataTests {
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.SingleClick);
+    }
+
+    @Test
+    public void single_click_does_not_happen_if_button_is_never_pressed(){
+        var mouse = new Mouse();
+        var listener = new SpyEventListener();
+        mouse.subscribe(listener);
+
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+
+        assertThat(listener.wasEventTriggered).isFalse();
     }
 }

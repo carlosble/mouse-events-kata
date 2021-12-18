@@ -6,14 +6,16 @@ import java.util.List;
 public class Mouse {
     private List<MouseEventListener> listeners = new ArrayList<>();
     private final long timeWindowInMillisecondsForDoubleClick = 500;
+    private long lastTimePressed;
 
     public void pressLeftButton(long currentTimeInMilliseconds) {
-        /*... debe notificar a los suscriptores ...*/
-        /*... y gestionar el estado ...*/
+        lastTimePressed = currentTimeInMilliseconds;
     }
 
     public void releaseLeftButton(long currentTimeInMilliseconds) {
-        notifySubscribers(MouseEventType.SingleClick);
+        if (lastTimePressed > 0) {
+            notifySubscribers(MouseEventType.SingleClick);
+        }
     }
 
     public void move(MousePointerCoordinates from, MousePointerCoordinates to, long

@@ -89,4 +89,22 @@ public class MouseEventsKataTests {
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.DoubleClick);
         assertThat(listener.eventCount).isEqualTo(1);
     }
+
+    @Test
+    public void triple_click_happens_when_single_click_is_repetead_quickly() throws InterruptedException {
+        var mouse = new Mouse();
+        var listener = new SpyEventListener();
+        mouse.subscribe(listener);
+
+        mouse.pressLeftButton(System.currentTimeMillis());
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+        mouse.pressLeftButton(System.currentTimeMillis());
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+        mouse.pressLeftButton(System.currentTimeMillis());
+        mouse.releaseLeftButton(System.currentTimeMillis() + 10);
+
+        Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
+        assertThat(listener.receivedEventType).isEqualTo(MouseEventType.TripleClick);
+        assertThat(listener.eventCount).isEqualTo(1);
+    }
 }

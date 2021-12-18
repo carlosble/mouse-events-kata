@@ -14,6 +14,7 @@ public class Mouse {
     private boolean buttonIsPressed;
     private boolean isWaitingToTriggerSingleClick;
     private boolean isWaitingToTriggerDoubleClick;
+    private boolean isWaitingToTriggerTripleClick;
     private static MouseEventType eventToTrigger;
 
     public void pressLeftButton(long currentTimeInMilliseconds) {
@@ -28,21 +29,28 @@ public class Mouse {
                 isWaitingToTriggerSingleClick = true;
                 eventToTrigger = MouseEventType.SingleClick;
             }
-            else {
+            else if (!isWaitingToTriggerDoubleClick) {
                 isWaitingToTriggerDoubleClick = true;
                 eventToTrigger = MouseEventType.DoubleClick;
+            }
+            else {
+                isWaitingToTriggerTripleClick = true;
+                eventToTrigger = MouseEventType.TripleClick;
             }
             CompletableFuture.delayedExecutor(
                     timeWindowInMillisecondsForDoubleClick,
                     TimeUnit.MILLISECONDS).execute(
                             () -> {
                                 var shouldNotify = isWaitingToTriggerSingleClick ||
-                                        isWaitingToTriggerDoubleClick;
+                                        isWaitingToTriggerDoubleClick || isWaitingToTriggerTripleClick;
                                 if (isWaitingToTriggerSingleClick) {
                                     isWaitingToTriggerSingleClick = false;
                                 }
                                 if (isWaitingToTriggerDoubleClick) {
                                     isWaitingToTriggerDoubleClick = false;
+                                }
+                                if (isWaitingToTriggerTripleClick) {
+                                    isWaitingToTriggerTripleClick = false;
                                 }
                                 if (shouldNotify){
                                     notifySubscribers(eventToTrigger);

@@ -113,6 +113,18 @@ public class MouseEventsKataTests {
     }
 
     @Test
+    public void dropping_means_clicking_plus_moving_plus_releasing() throws InterruptedException {
+        long firstTime = System.currentTimeMillis();
+        mouse.pressLeftButton(firstTime);
+        mouse.move(new MousePointerCoordinates(100, 100),
+                new MousePointerCoordinates(200,200),
+                firstTime + 10);
+        mouse.releaseLeftButton(firstTime + 20);
+
+        assertThat(listener.receivedEventType).isEqualTo(MouseEventType.Drop);
+    }
+
+    @Test
     public void dragging_means_button_is_currently_pressed() throws InterruptedException {
         long firstTime = System.currentTimeMillis();
         mouse.move(new MousePointerCoordinates(100, 100),

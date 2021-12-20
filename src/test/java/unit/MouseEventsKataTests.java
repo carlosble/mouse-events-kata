@@ -91,10 +91,10 @@ public class MouseEventsKataTests {
         long firstTime = System.currentTimeMillis();
         mouse.pressLeftButton(firstTime);
         mouse.releaseLeftButton(firstTime + 10);
-        mouse.pressLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick - 50);
-        mouse.releaseLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick - 5);
-        mouse.pressLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick + 10);
-        mouse.releaseLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick + 20);
+        mouse.pressLeftButton(firstTime + Mouse.clickTimeWindow - 50);
+        mouse.releaseLeftButton(firstTime + Mouse.clickTimeWindow - 5);
+        mouse.pressLeftButton(firstTime + Mouse.clickTimeWindow + 10);
+        mouse.releaseLeftButton(firstTime + Mouse.clickTimeWindow + 20);
 
         delaySimulatingHumanUser();
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.TripleClick);
@@ -136,6 +136,6 @@ public class MouseEventsKataTests {
     }
 
     private void delaySimulatingHumanUser() throws InterruptedException {
-        Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
+        Thread.sleep(Mouse.clickTimeWindow + 100);
     }
 }

@@ -3,6 +3,7 @@ package unit;
 import mouse.Mouse;
 import mouse.MouseEventListener;
 import mouse.MouseEventType;
+import mouse.MousePointerCoordinates;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,7 +51,7 @@ public class MouseEventsKataTests {
         mouse.pressLeftButton(System.currentTimeMillis());
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
-        waitForTimeWindow();
+        delaySimulatingHumanUser();
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.SingleClick);
     }
 
@@ -58,7 +59,7 @@ public class MouseEventsKataTests {
     public void single_click_does_not_happen_if_button_is_never_pressed() throws InterruptedException {
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
-        waitForTimeWindow();
+        delaySimulatingHumanUser();
         assertThat(listener.wasEventTriggered).isFalse();
     }
 
@@ -69,7 +70,7 @@ public class MouseEventsKataTests {
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
-        waitForTimeWindow();
+        delaySimulatingHumanUser();
         assertThat(listener.eventCount).isEqualTo(1);
     }
 
@@ -80,7 +81,7 @@ public class MouseEventsKataTests {
         mouse.pressLeftButton(System.currentTimeMillis());
         mouse.releaseLeftButton(System.currentTimeMillis() + 10);
 
-        waitForTimeWindow();
+        delaySimulatingHumanUser();
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.DoubleClick);
         assertThat(listener.eventCount).isEqualTo(1);
     }
@@ -95,12 +96,23 @@ public class MouseEventsKataTests {
         mouse.pressLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick + 10);
         mouse.releaseLeftButton(firstTime + Mouse.timeWindowInMillisecondsForDoubleClick + 20);
 
-        waitForTimeWindow();
+        delaySimulatingHumanUser();
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.TripleClick);
         assertThat(listener.eventCount).isEqualTo(1);
     }
 
-    private void waitForTimeWindow() throws InterruptedException {
+    @Test
+    public void dragging_means_clicking_plus_moving() throws InterruptedException {
+        long firstTime = System.currentTimeMillis();
+        mouse.pressLeftButton(firstTime);
+        mouse.move(new MousePointerCoordinates(100, 100),
+                   new MousePointerCoordinates(200,200),
+                   firstTime + 10);
+
+        assertThat(listener.receivedEventType).isEqualTo(MouseEventType.Drag);
+    }
+
+    private void delaySimulatingHumanUser() throws InterruptedException {
         Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
     }
 }

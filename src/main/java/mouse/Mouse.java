@@ -61,8 +61,7 @@ public class Mouse {
 
     public void move(MousePointerCoordinates from, MousePointerCoordinates to, long
             currentTimeInMilliseconds) {
-        /*... debe notificar a los suscriptores ...*/
-        /*... y gestionar el estado ...*/
+        notifySubscribers(MouseEventType.Drag);
     }
 
     public void subscribe(MouseEventListener listener) {

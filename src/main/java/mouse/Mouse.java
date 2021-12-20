@@ -61,7 +61,9 @@ public class Mouse {
 
     public void move(MousePointerCoordinates from, MousePointerCoordinates to, long
             currentTimeInMilliseconds) {
-        notifySubscribers(MouseEventType.Drag);
+        if (buttonIsPressed) {
+            notifySubscribers(MouseEventType.Drag);
+        }
     }
 
     public void subscribe(MouseEventListener listener) {

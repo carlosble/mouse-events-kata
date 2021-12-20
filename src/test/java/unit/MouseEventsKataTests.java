@@ -112,6 +112,17 @@ public class MouseEventsKataTests {
         assertThat(listener.receivedEventType).isEqualTo(MouseEventType.Drag);
     }
 
+    @Test
+    public void dragging_means_button_is_currently_pressed() throws InterruptedException {
+        long firstTime = System.currentTimeMillis();
+        mouse.move(new MousePointerCoordinates(100, 100),
+                new MousePointerCoordinates(200,200),
+                firstTime + 10);
+
+        delaySimulatingHumanUser();
+        assertThat(listener.eventCount).isEqualTo(0);
+    }
+
     private void delaySimulatingHumanUser() throws InterruptedException {
         Thread.sleep(Mouse.timeWindowInMillisecondsForDoubleClick + 100);
     }
